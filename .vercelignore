@@ -1,27 +1,16 @@
-# Exclude everything except public/ directory
-backend/
-database/
-styles/
-README.md
-.gitignore
+# Ignore backend code
+/backend
+
+# Ignore local environment files
 .env
-*.md
+.env.local
+
+# Ignore git and system files
+.git
+.gitignore
+
+# Ignore dependencies (they will be reinstalled on build)
+node_modules
+
+# Ignore logs
 *.log
-
-# Exclude server files (needed for Render)
-package.json
-package-lock.json
-server.js
-server-local.js
-build-config.js
-node_modules/
-
-# Exclude root files
-index.html
-test.html
-main.js
-config.js
-assets/
-
-# Only include public/ directory
-!public/
