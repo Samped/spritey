@@ -13,4 +13,5 @@ package.json
 package-lock.json
 server.js
 server-local.js
+build-config.js
 node_modules/
