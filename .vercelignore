@@ -12,4 +12,5 @@ README.md
 package.json
 package-lock.json
 server.js
+server-local.js
 node_modules/
