@@ -30,8 +30,8 @@ coinImage.onerror = function() {
 const gunEnemyImage = new Image();
 gunEnemyImage.src = 'assets/enemies/gun.png';
 
-const incoEnemyImage = new Image();
-incoEnemyImage.src = 'assets/enemies/inco-enemy.png';
+const spriteyenemyImage = new Image();
+spriteyenemyImage.src = 'assets/enemies/spriteyenemy.png';
 
 // Load multiple background images for progression
 const backgroundImages = [];
@@ -55,8 +55,8 @@ let backgroundTransitionProgress = 0;
 let backgroundTransitionSpeed = 0.002; // Speed of transition
 let backgroundChangeTrigger = 0; // Score threshold for background changes
 
-const incomascot = new Image();
-incomascot.src = 'assets/gain/incomascot.png';
+const spriteywin = new Image();
+spriteywin.src = 'assets/gain/spriteywin.png';
 
 // Load sound effects
 const sounds = {
@@ -199,8 +199,8 @@ function imageLoaded() {
 playerImage.onload = imageLoaded;
 coinImage.onload = imageLoaded;
 gunEnemyImage.onload = imageLoaded;
-incoEnemyImage.onload = imageLoaded;
-incomascot.onload = imageLoaded;
+spriteyenemyImage.onload = imageLoaded;
+spriteywin.onload = imageLoaded;
 
 // Add onload handlers for background images
 backgroundImages.forEach((img, index) => {
@@ -700,6 +700,7 @@ window.addEventListener('keydown', (e) => {
     // Add restart functionality
     if (e.code === 'KeyR' && player.gameWon) {
         resetGame();
+        showMainMenu();  // Return to main menu after game completion
         playSound('coin');
     }
 });
@@ -779,10 +780,12 @@ function updateCamera() {
 function checkPlayerDeath() {
     if (player.y > canvas.height + 100) {  // Player has fallen off the screen
         player.deaths++;  // Increment death count
-        if (player.deaths >= 3) {
-            // Game over - reset everything
-            resetGame();
-        } else {
+        if (player.deaths >= 3 && !gameOverShown) {
+            // Game over - save score and show game over screen
+            gameOverShown = true;
+            savePlayerScore();
+            showGameOverScreen();
+        } else if (player.deaths < 3) {
             // Reset player position
             resetPlayer();
         }
@@ -805,6 +808,7 @@ function resetGame() {
     player.deaths = 0;
     player.score = 0;
     player.gameWon = false;  // Reset win state
+    gameOverShown = false;  // Reset game over flag
     
     // Reset all coins
     for (const coin of coins) {
@@ -815,29 +819,29 @@ function resetGame() {
     enemies.length = 0;  // Clear existing enemies
     enemies.push(
         // First section enemies (Easy)
-        { x: 800, y: canvas.height - 600 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 800, endX: 1000, platformY: canvas.height - 600 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },
-        { x: 7200, y: canvas.height - 200 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 1200, endX: 1400, platformY: canvas.height - 200 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },
-        { x: 8600, y: canvas.height - 450 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 1600, endX: 1800, platformY: canvas.height - 450 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },
+        { x: 800, y: canvas.height - 600 - 180, width: 180, height: 180, speed: 2, direction: 1, startX: 800, endX: 1000, platformY: canvas.height - 600 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },
+        { x: 7200, y: canvas.height - 200 - 120, width: 120, height: 120, speed: 2, direction: 1, startX: 1200, endX: 1400, platformY: canvas.height - 200 - 120, lastShot: 0, shootDelay: 2000, type: 'gun' },
+        { x: 8600, y: canvas.height - 450 - 180, width: 180, height: 180, speed: 2, direction: 1, startX: 1600, endX: 1800, platformY: canvas.height - 450 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },
         
         // L-shaped section enemies (Medium)
-        { x: 3700, y: canvas.height - 600 - 100, width: 100, height: 100, speed: 3, direction: 1, startX: 3700, endX: 3900, platformY: canvas.height - 600 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },
+        { x: 3700, y: canvas.height - 600 - 180, width: 180, height: 180, speed: 3, direction: 1, startX: 3700, endX: 3900, platformY: canvas.height - 600 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },
         
         // Mixed structures enemies (Hard)
-        { x: 5600, y: canvas.height - 450 - 200, width: 100, height: 100, speed: 3, direction: 1, startX: 5600, endX: 5800, platformY: canvas.height - 450 - 200, lastShot: 0, shootDelay: 2000, type: 'inco' },
+        { x: 5600, y: canvas.height - 450 - 200, width: 180, height: 180, speed: 3, direction: 1, startX: 5600, endX: 5800, platformY: canvas.height - 450 - 200, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },
         
         // Complex L-shaped enemies (Expert)
-        { x: 12200, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 6200, endX: 6800, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },
-        { x: 6400, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: -1, startX: 6400, endX: 6200, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },
-        { x: 11600, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 6600, endX: 7000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },
-        { x: 7000, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 7000, endX: 7400, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },
+        { x: 12200, y: canvas.height - 400 - 120, width: 120, height: 120, speed: 4, direction: 1, startX: 6200, endX: 6800, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun' },
+        { x: 6400, y: canvas.height - 400 - 180, width: 180, height: 180, speed: 4, direction: -1, startX: 6400, endX: 6200, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },
+        { x: 11600, y: canvas.height - 400 - 120, width: 120, height: 120, speed: 4, direction: 1, startX: 6600, endX: 7000, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun' },
+        { x: 7000, y: canvas.height - 400 - 120, width: 120, height: 120, speed: 4, direction: 1, startX: 7000, endX: 7400, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun' },
         
         // Fourth frame enemies (3 enemies) - Walking up and down
-        { x: 16600, y: canvas.height - 800 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 7600, endX: 7600, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-        { x: 7800, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 2, direction: -1, startX: 7800, endX: 7800, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-        { x: 18000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-        { x: 19000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 9000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-        { x: 19500, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 10000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-        { x: 20000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 }
+        { x: 16600, y: canvas.height - 800 - 1000, width: 120, height: 120, speed: 2, direction: -1, startX: 7600, endX: 7600, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 120, endY: canvas.height - 200 - 120 },
+        { x: 7800, y: canvas.height - 400 - 180, width: 180, height: 180, speed: 2, direction: -1, startX: 7800, endX: 7800, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 },
+        { x: 18000, y: canvas.height - 600 - 1000, width: 120, height: 120, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 120, endY: canvas.height - 200 - 120 },
+        { x: 19000, y: canvas.height - 600 - 1000, width: 180, height: 180, speed: 2, direction: -1, startX: 9000, endX: 8000, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 },
+        { x: 19500, y: canvas.height - 600 - 1000, width: 120, height: 120, speed: 2, direction: -1, startX: 10000, endX: 8000, platformY: canvas.height - 400 - 120, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 120, endY: canvas.height - 200 - 120 },
+        { x: 20000, y: canvas.height - 600 - 1000, width: 180, height: 180, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 }
     );
     
     // Clear bullets
@@ -857,7 +861,9 @@ function checkCoinCollection() {
             if (coin.isSpecial) {
                 player.score += 150;  // Add 150 points for special coin
                 player.gameWon = true;  // Set game won state
+                savePlayerScore();  // Save score to leaderboard
                 playSound('win');
+                showCongratulationsScreen();  // Show congratulations with leaderboard
             } else {
                 player.score += 2;  // Regular coins give 2 points
                 playSound('coin');
@@ -870,8 +876,8 @@ function checkCoinCollection() {
 function drawCoins() {
     for (const coin of coins) {
         if (!coin.collected) {
-            if (coin.isSpecial && incomascot.complete) {
-                ctx.drawImage(incomascot, coin.x, coin.y, coin.width * 3, coin.height * 3);
+            if (coin.isSpecial && spriteywin.complete) {
+                ctx.drawImage(spriteywin, coin.x, coin.y, coin.width * 3, coin.height * 3);
             } else if (coinImage.complete) {
                 // Regular coin drawing code - only draw if image is loaded
                 ctx.save();
@@ -1030,7 +1036,7 @@ function drawDashboard() {
     
     // Draw dashboard background with transparency
     ctx.fillStyle = 'rgba(44, 62, 80, 0.2)';
-    ctx.fillRect(20, 20, 360, 70);  // Reverted back to original size
+    ctx.fillRect(20, 20, 360, 90);  // Increased height for player name
     
     // Draw SPRITEY with fun font
     ctx.fillStyle = '#fff';
@@ -1038,22 +1044,29 @@ function drawDashboard() {
     ctx.textAlign = 'center';
     ctx.fillText('SPRITEY', 200, 40);  // Reverted x position
     
+    // Draw player name if available
+    if (currentPlayer) {
+        ctx.fillStyle = '#4EF6D3';
+        ctx.font = 'bold 16px "Comic Sans MS"';
+        ctx.fillText(currentPlayer.name, 200, 60);
+    }
+    
     // Draw coin and score
     ctx.beginPath();
-    ctx.arc(200, 75, 15, 0, Math.PI * 2);  // Reverted x position
+    ctx.arc(200, 85, 15, 0, Math.PI * 2);  // Moved down for player name
     ctx.fillStyle = '#FFD700';
     ctx.fill();
     
     // Draw shine
     ctx.beginPath();
-    ctx.arc(195, 70, 5, 0, Math.PI * 2);  // Reverted x position
+    ctx.arc(195, 80, 5, 0, Math.PI * 2);  // Moved down for player name
     ctx.fillStyle = '#FFF8DC';
     ctx.fill();
     
     // Draw score
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 20px "Comic Sans MS"';
-    ctx.fillText(`${player.score}`, 230, 80);  // Reverted x position
+    ctx.fillText(`${player.score}`, 230, 90);  // Moved down for player name
     
     ctx.restore();
 }
@@ -1105,29 +1118,29 @@ const bulletMaxDistance = 500;
 // Enemy properties
 const enemies = [
     // First section enemies (Easy)
-    { x: 800, y: canvas.height - 600 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 800, endX: 1000, platformY: canvas.height - 600 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },  // On mid-high platform
+    { x: 800, y: canvas.height - 600 - 180, width: 180, height: 180, speed: 2, direction: 1, startX: 800, endX: 1000, platformY: canvas.height - 600 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },  // On mid-high platform
     { x: 7200, y: canvas.height - 200 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 1200, endX: 1400, platformY: canvas.height - 200 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' }, // On mid platform
-    { x: 8600, y: canvas.height - 450 - 100, width: 100, height: 100, speed: 2, direction: 1, startX: 1600, endX: 1800, platformY: canvas.height - 450 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' }, // On high platform
+    { x: 8600, y: canvas.height - 450 - 180, width: 180, height: 180, speed: 2, direction: 1, startX: 1600, endX: 1800, platformY: canvas.height - 450 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' }, // On high platform
     
     // L-shaped section enemies (Medium)
-    { x: 3700, y: canvas.height - 600 - 100, width: 100, height: 100, speed: 3, direction: 1, startX: 3700, endX: 3900, platformY: canvas.height - 600 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },  // On horizontal part of L
+    { x: 3700, y: canvas.height - 600 - 180, width: 180, height: 180, speed: 3, direction: 1, startX: 3700, endX: 3900, platformY: canvas.height - 600 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },  // On horizontal part of L
 
     // Mixed structures enemies (Hard)
-    { x: 5600, y: canvas.height - 450 - 200, width: 100, height: 100, speed: 3, direction: 1, startX: 5600, endX: 5800, platformY: canvas.height - 450 - 200, lastShot: 0, shootDelay: 2000, type: 'inco' },  // On wide platform
+    { x: 5600, y: canvas.height - 450 - 200, width: 180, height: 180, speed: 3, direction: 1, startX: 5600, endX: 5800, platformY: canvas.height - 450 - 200, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },  // On wide platform
 
     // Complex L-shaped enemies (Expert)
     { x: 12200, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 6200, endX: 6800, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },  // On horizontal part of L
-    { x: 6400, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: -1, startX: 6400, endX: 6200, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco' },  // On horizontal part of L
+    { x: 6400, y: canvas.height - 400 - 180, width: 180, height: 180, speed: 4, direction: -1, startX: 6400, endX: 6200, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy' },  // On horizontal part of L
     { x: 11600, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 6600, endX: 7000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },  // On horizontal part of L
     { x: 7000, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 4, direction: 1, startX: 7000, endX: 7400, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun' },  // On horizontal part of L
 
     // Fourth frame enemies (3 enemies) - Walking up and down
     { x: 16600, y: canvas.height - 800 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 7600, endX: 7600, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-    { x: 7800, y: canvas.height - 400 - 100, width: 100, height: 100, speed: 2, direction: -1, startX: 7800, endX: 7800, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
+    { x: 7800, y: canvas.height - 400 - 180, width: 180, height: 180, speed: 2, direction: -1, startX: 7800, endX: 7800, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 },
     { x: 18000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-    { x: 19000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 9000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
+    { x: 19000, y: canvas.height - 600 - 1000, width: 180, height: 180, speed: 2, direction: -1, startX: 9000, endX: 8000, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 },
     { x: 19500, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 10000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'gun', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 },
-    { x: 20000, y: canvas.height - 600 - 1000, width: 100, height: 100, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 100, lastShot: 0, shootDelay: 2000, type: 'inco', vertical: true, startY: canvas.height - 400 - 100, endY: canvas.height - 200 - 100 }
+    { x: 20000, y: canvas.height - 600 - 1000, width: 180, height: 180, speed: 2, direction: -1, startX: 8000, endX: 8000, platformY: canvas.height - 400 - 180, lastShot: 0, shootDelay: 2000, type: 'spriteyenemy', vertical: true, startY: canvas.height - 400 - 180, endY: canvas.height - 200 - 180 }
 ];
 
 // Add player shooting variables
@@ -1154,10 +1167,12 @@ function updateBullets() {
             player.y + player.height > bullet.y - bullet.radius &&
             player.y < bullet.y + bullet.radius) {
             player.deaths++;
-            if (player.deaths >= 3) {
-                resetGame();
+            if (player.deaths >= 3 && !gameOverShown) {
+                gameOverShown = true;
+                savePlayerScore();
+                showGameOverScreen();
                 playSound('gameOver');
-            } else {
+            } else if (player.deaths < 3) {
                 resetPlayer();
                 playSound('playerHit');
             }
@@ -1302,10 +1317,12 @@ function updateEnemies() {
             player.y < enemy.y + enemy.height) {
             // Player dies when touching enemy
             player.deaths++;
-            if (player.deaths >= 3) {
-                resetGame();
+            if (player.deaths >= 3 && !gameOverShown) {
+                gameOverShown = true;
+                savePlayerScore();
+                showGameOverScreen();
                 playSound('gameOver');
-            } else {
+            } else if (player.deaths < 3) {
                 resetPlayer();
                 playSound('playerHit');
             }
@@ -1335,8 +1352,8 @@ function drawEnemies() {
             }
             ctx.restore();
         } else {
-            // Draw inco enemy
-            ctx.drawImage(incoEnemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+            // Draw spriteyenemy enemy
+            ctx.drawImage(spriteyenemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
         }
     }
 }
@@ -1438,8 +1455,8 @@ function draw() {
 function initGame() {
     createCoins();  // Create coins
     resetPlayer();
-    createPopupScreen();  // Show popup screen
     createMobileControls(); // Add mobile controls
+    // Don't initialize auth system here - let the event listeners handle it
 }
 
 // Game loop
@@ -1451,7 +1468,75 @@ function gameLoop() {
 
 // Start the game
 initGame();  // Initialize game first
-gameLoop();  // Then start the game loop
+// Game loop will start when player clicks play button
+
+// Function to initialize authentication
+function initializeAuth() {
+    console.log('Initializing authentication system...');
+    
+    // Clear any existing overlays first
+    const existingOverlays = document.querySelectorAll('.auth-overlay');
+    existingOverlays.forEach(overlay => overlay.remove());
+    
+    // Load leaderboard from localStorage
+    const savedLeaderboard = localStorage.getItem('spriteyLeaderboard');
+    if (savedLeaderboard) {
+        leaderboard = JSON.parse(savedLeaderboard);
+    }
+    
+    // Always show login screen
+    showLoginScreen();
+}
+
+// Multiple event listeners to ensure login screen always appears
+window.addEventListener('load', initializeAuth);
+document.addEventListener('DOMContentLoaded', initializeAuth);
+
+// Immediate execution as backup
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAuth);
+} else {
+    // DOM is already ready
+    setTimeout(initializeAuth, 100);
+}
+
+// Force initialization after a short delay as final backup
+setTimeout(() => {
+    if (!document.querySelector('.auth-overlay')) {
+        console.log('No auth overlay found, forcing initialization...');
+        initializeAuth();
+    }
+}, 500);
+
+// Save player score to leaderboard
+function savePlayerScore() {
+    if (!currentPlayer) return;
+    
+    // Update player stats
+    currentPlayer.gamesPlayed++;
+    currentPlayer.totalScore += player.score;
+    if (player.score > currentPlayer.bestScore) {
+        currentPlayer.bestScore = player.score;
+    }
+    
+    // Save updated player data
+    localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+    
+    // Update or add to leaderboard
+    const existingPlayerIndex = leaderboard.findIndex(p => p.id === currentPlayer.id);
+    if (existingPlayerIndex >= 0) {
+        // Update existing player
+        leaderboard[existingPlayerIndex] = { ...currentPlayer };
+    } else {
+        // Add new player to leaderboard
+        leaderboard.push({ ...currentPlayer });
+    }
+    
+    // Save leaderboard
+    localStorage.setItem('spriteyLeaderboard', JSON.stringify(leaderboard));
+    
+    console.log('Score saved:', currentPlayer.name, player.score);
+}
 
 // Add drawWinScreen function
 function drawWinScreen() {
@@ -1473,15 +1558,880 @@ function drawWinScreen() {
     ctx.fillText(`Final Score: ${player.score}`, canvas.width/2, canvas.height/2 + 20);
     ctx.fillText(`Deaths: ${player.deaths}`, canvas.width/2, canvas.height/2 + 60);
     
+    // Player name
+    ctx.fillStyle = '#00aaff';
+    ctx.fillText(`Player: ${currentPlayer ? currentPlayer.name : 'Unknown'}`, canvas.width/2, canvas.height/2 + 100);
+    
     // Restart message
     ctx.font = 'bold 20px "Comic Sans MS"';
-    ctx.fillText('Press R to Restart', canvas.width/2, canvas.height/2 + 120);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('Press R to Restart', canvas.width/2, canvas.height/2 + 140);
     
     ctx.restore();
 }
 
 // Add game state
 let gameStarted = false;
+let currentPlayer = null;
+let leaderboard = [];
+let gameOverShown = false;
+
+// Authentication system
+function initAuthSystem() {
+    // Load leaderboard from localStorage
+    const savedLeaderboard = localStorage.getItem('spriteyLeaderboard');
+    if (savedLeaderboard) {
+        leaderboard = JSON.parse(savedLeaderboard);
+    }
+    
+    // Always show login screen on page load/refresh
+    // This ensures the login screen appears even if there's cached data
+    showLoginScreen();
+}
+
+// Show login/registration screen
+function showLoginScreen() {
+    console.log('Showing login screen...');
+    
+    // Remove existing popup if any
+    const existingOverlay = document.querySelector('.auth-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    overlay.style.zIndex = '2000';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.padding = '20px';
+
+    // Create login container
+    const loginContainer = document.createElement('div');
+    loginContainer.style.backgroundColor = 'rgba(15, 15, 25, 0.95)';
+    loginContainer.style.padding = 'clamp(24px, 5vw, 40px)';
+    loginContainer.style.borderRadius = 'clamp(12px, 2vw, 16px)';
+    loginContainer.style.color = 'white';
+    loginContainer.style.textAlign = 'center';
+    loginContainer.style.width = 'min(95%, 480px)';
+    loginContainer.style.maxWidth = '480px';
+    loginContainer.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    loginContainer.style.border = '1px solid rgba(78, 246, 211, 0.2)';
+    loginContainer.style.boxSizing = 'border-box';
+    loginContainer.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(78, 246, 211, 0.1)';
+    loginContainer.style.backdropFilter = 'blur(20px)';
+    loginContainer.style.position = 'relative';
+    loginContainer.style.overflow = 'hidden';
+    loginContainer.style.margin = 'auto';
+
+    // Title
+    const title = document.createElement('h1');
+    title.textContent = 'Spritey Adventure';
+    title.style.color = '#ffffff';
+    title.style.marginBottom = 'clamp(8px, 2vw, 12px)';
+    title.style.fontWeight = '700';
+    title.style.fontSize = 'clamp(24px, 6vw, 32px)';
+    title.style.letterSpacing = '-0.02em';
+    title.style.lineHeight = '1.2';
+    loginContainer.appendChild(title);
+
+    // Subtitle
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Enter your name to begin your adventure';
+    subtitle.style.color = 'rgba(255, 255, 255, 0.7)';
+    subtitle.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    subtitle.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    subtitle.style.fontWeight = '400';
+    loginContainer.appendChild(subtitle);
+
+    // Player name input
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Player Name';
+    nameLabel.style.display = 'block';
+    nameLabel.style.marginBottom = '8px';
+    nameLabel.style.fontSize = '14px';
+    nameLabel.style.color = 'rgba(255, 255, 255, 0.8)';
+    nameLabel.style.fontWeight = '500';
+    nameLabel.style.textAlign = 'left';
+    loginContainer.appendChild(nameLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Enter your name...';
+    nameInput.style.width = '100%';
+    nameInput.style.padding = 'clamp(12px, 3vw, 16px)';
+    nameInput.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    nameInput.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    nameInput.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    nameInput.style.marginBottom = 'clamp(20px, 4vw, 24px)';
+    nameInput.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    nameInput.style.textAlign = 'left';
+    nameInput.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+    nameInput.style.color = 'white';
+    nameInput.style.outline = 'none';
+    nameInput.style.transition = 'all 0.2s ease';
+    nameInput.style.boxShadow = 'none';
+    nameInput.style.boxSizing = 'border-box';
+    
+    // Input focus effects
+    nameInput.addEventListener('focus', () => {
+        nameInput.style.borderColor = '#4EF6D3';
+        nameInput.style.boxShadow = '0 0 0 2px rgba(78, 246, 211, 0.2)';
+        nameInput.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+    });
+    
+    nameInput.addEventListener('blur', () => {
+        nameInput.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        nameInput.style.boxShadow = 'none';
+        nameInput.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+    });
+    
+    loginContainer.appendChild(nameInput);
+
+    // Login button
+    const loginButton = document.createElement('button');
+    loginButton.textContent = 'Start Adventure';
+    loginButton.style.padding = 'clamp(12px, 3vw, 16px) clamp(20px, 4vw, 24px)';
+    loginButton.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    loginButton.style.backgroundColor = '#4EF6D3';
+    loginButton.style.color = '#000';
+    loginButton.style.border = 'none';
+    loginButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    loginButton.style.cursor = 'pointer';
+    loginButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    loginButton.style.transition = 'all 0.2s ease';
+    loginButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+    loginButton.style.width = '100%';
+    loginButton.style.fontWeight = '600';
+    loginButton.style.textShadow = 'none';
+    loginButton.style.boxSizing = 'border-box';
+
+    // Button hover effect
+    loginButton.onmouseover = () => {
+        loginButton.style.transform = 'translateY(-2px)';
+        loginButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.5)';
+        loginButton.style.backgroundColor = '#5EF7E3';
+    };
+    loginButton.onmouseout = () => {
+        loginButton.style.transform = 'translateY(0)';
+        loginButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+        loginButton.style.backgroundColor = '#4EF6D3';
+    };
+
+    // Login functionality
+    loginButton.onclick = () => {
+        const playerName = nameInput.value.trim();
+        if (playerName.length < 2) {
+            alert('Please enter a name with at least 2 characters!');
+            return;
+        }
+        
+        // Create player object
+        currentPlayer = {
+            name: playerName,
+            id: Date.now().toString(),
+            joinDate: new Date().toISOString(),
+            gamesPlayed: 0,
+            totalScore: 0,
+            bestScore: 0
+        };
+        
+        // Save player to localStorage
+        localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+        
+        // Remove login screen
+        overlay.remove();
+        
+        // Show main menu
+        showMainMenu();
+    };
+
+    // Allow Enter key to login
+    nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            loginButton.click();
+        }
+    });
+
+    loginContainer.appendChild(loginButton);
+    overlay.appendChild(loginContainer);
+    document.body.appendChild(overlay);
+    
+    // Focus on input
+    nameInput.focus();
+    
+    console.log('Login screen created and added to DOM');
+}
+
+// Show game over screen with leaderboard
+function showGameOverScreen() {
+    // Remove existing popup if any
+    const existingOverlay = document.querySelector('.auth-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    overlay.style.zIndex = '2000';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.padding = '20px';
+
+    // Create game over container
+    const gameOverContainer = document.createElement('div');
+    gameOverContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+    gameOverContainer.style.padding = 'clamp(30px, 6vw, 40px)';
+    gameOverContainer.style.borderRadius = '20px';
+    gameOverContainer.style.color = 'white';
+    gameOverContainer.style.textAlign = 'center';
+    gameOverContainer.style.width = 'min(90%, 700px)';
+    gameOverContainer.style.maxHeight = '90vh';
+    gameOverContainer.style.overflowY = 'auto';
+    gameOverContainer.style.fontFamily = '"Comic Sans MS", cursive';
+    gameOverContainer.style.border = '4px solid #ff4444';
+    gameOverContainer.style.boxSizing = 'border-box';
+    gameOverContainer.style.boxShadow = '0 0 30px rgba(255, 68, 68, 0.3), inset 0 0 20px rgba(255, 68, 68, 0.1)';
+    gameOverContainer.style.backdropFilter = 'blur(10px)';
+
+    // Game Over title
+    const gameOverTitle = document.createElement('h1');
+    gameOverTitle.textContent = 'Game Over!';
+    gameOverTitle.style.color = '#ff4444';
+    gameOverTitle.style.marginBottom = 'clamp(20px, 4vw, 30px)';
+    gameOverTitle.style.fontSize = 'clamp(2em, 6vw, 3em)';
+    gameOverTitle.style.textShadow = '0 0 20px rgba(255, 68, 68, 0.8), 0 0 40px rgba(255, 68, 68, 0.4)';
+    gameOverTitle.style.fontWeight = 'bold';
+    gameOverContainer.appendChild(gameOverTitle);
+
+    // Final score display
+    const finalScore = document.createElement('div');
+    finalScore.innerHTML = `
+        <div style="margin-bottom: 25px; font-size: clamp(1.2em, 4vw, 1.5em); padding: 20px; border-radius: 15px; background: rgba(255, 68, 68, 0.1); border: 3px solid #ff4444;">
+            <strong style="color: #ff4444; text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);">Final Score: ${player.score}</strong><br>
+            <span style="color: #4EF6D3;">Player: ${currentPlayer ? currentPlayer.name : 'Unknown'}</span><br>
+            <span style="color: #4EF6D3;">Deaths: ${player.deaths}/3</span>
+        </div>
+    `;
+    gameOverContainer.appendChild(finalScore);
+
+    // Leaderboard title
+    const leaderboardTitle = document.createElement('h2');
+    leaderboardTitle.textContent = 'Final Leaderboard';
+    leaderboardTitle.style.color = '#4EF6D3';
+    leaderboardTitle.style.marginBottom = '20px';
+    leaderboardTitle.style.fontSize = 'clamp(1.3em, 4vw, 1.6em)';
+    leaderboardTitle.style.textShadow = '0 0 15px rgba(78, 246, 211, 0.8)';
+    leaderboardTitle.style.fontWeight = 'bold';
+    gameOverContainer.appendChild(leaderboardTitle);
+
+    // Leaderboard display
+    const leaderboardDiv = document.createElement('div');
+    leaderboardDiv.style.marginBottom = '30px';
+    leaderboardDiv.style.maxHeight = '300px';
+    leaderboardDiv.style.overflowY = 'auto';
+    leaderboardDiv.style.border = '3px solid #4EF6D3';
+    leaderboardDiv.style.borderRadius = '15px';
+    leaderboardDiv.style.padding = '20px';
+    leaderboardDiv.style.backgroundColor = 'rgba(78, 246, 211, 0.05)';
+    leaderboardDiv.style.boxShadow = '0 0 20px rgba(78, 246, 211, 0.2)';
+
+    if (leaderboard.length === 0) {
+        leaderboardDiv.innerHTML = '<div style="color: #888; font-size: 1.2em;">No scores yet. Be the first to play!</div>';
+    } else {
+        // Sort leaderboard by best score
+        const sortedLeaderboard = [...leaderboard].sort((a, b) => b.bestScore - a.bestScore);
+        
+        sortedLeaderboard.forEach((player, index) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.style.display = 'flex';
+            playerDiv.style.justifyContent = 'space-between';
+            playerDiv.style.alignItems = 'center';
+            playerDiv.style.padding = '12px 15px';
+            playerDiv.style.margin = '5px 0';
+            playerDiv.style.borderRadius = '10px';
+            playerDiv.style.fontSize = 'clamp(1em, 3vw, 1.2em)';
+            
+            const isCurrentPlayer = player.id === currentPlayer.id;
+            playerDiv.style.backgroundColor = isCurrentPlayer ? 'rgba(78, 246, 211, 0.3)' : 'rgba(78, 246, 211, 0.1)';
+            playerDiv.style.color = isCurrentPlayer ? '#4EF6D3' : 'white';
+            playerDiv.style.border = isCurrentPlayer ? '2px solid #4EF6D3' : '1px solid rgba(78, 246, 211, 0.3)';
+            
+            // Add rank number
+            let rankText = `${index + 1}.`;
+            
+            playerDiv.innerHTML = `
+                <span style="font-weight: bold;">${rankText} ${player.name}</span>
+                <span style="font-weight: bold; color: #4EF6D3;">${player.bestScore} pts</span>
+            `;
+            leaderboardDiv.appendChild(playerDiv);
+        });
+    }
+    gameOverContainer.appendChild(leaderboardDiv);
+
+    // Button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = '15px';
+    buttonContainer.style.flexDirection = 'column';
+
+    // Play Again button
+    const playAgainButton = document.createElement('button');
+    playAgainButton.textContent = 'Play Again';
+    playAgainButton.style.padding = 'clamp(15px, 4vw, 20px) clamp(25px, 6vw, 35px)';
+    playAgainButton.style.fontSize = 'clamp(1.3em, 4vw, 1.6em)';
+    playAgainButton.style.backgroundColor = '#4EF6D3';
+    playAgainButton.style.color = '#000';
+    playAgainButton.style.border = 'none';
+    playAgainButton.style.borderRadius = '15px';
+    playAgainButton.style.cursor = 'pointer';
+    playAgainButton.style.fontFamily = '"Comic Sans MS", cursive';
+    playAgainButton.style.transition = 'all 0.3s ease';
+    playAgainButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.4)';
+    playAgainButton.style.width = '100%';
+    playAgainButton.style.fontWeight = 'bold';
+    playAgainButton.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+
+    // Play Again button hover effect
+    playAgainButton.onmouseover = () => {
+        playAgainButton.style.transform = 'scale(1.05) translateY(-2px)';
+        playAgainButton.style.boxShadow = '0 12px 30px rgba(78, 246, 211, 0.6)';
+        playAgainButton.style.backgroundColor = '#5EF7E3';
+    };
+    playAgainButton.onmouseout = () => {
+        playAgainButton.style.transform = 'scale(1) translateY(0)';
+        playAgainButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.4)';
+        playAgainButton.style.backgroundColor = '#4EF6D3';
+    };
+
+    playAgainButton.onclick = () => {
+        overlay.remove();
+        resetGame();
+        // Start the game directly without going to main menu
+        gameStarted = true;
+        playBackgroundMusic();
+        showMobileControls();
+        if (!window.gameLoopRunning) {
+            window.gameLoopRunning = true;
+            gameLoop();
+        }
+    };
+
+    buttonContainer.appendChild(playAgainButton);
+    gameOverContainer.appendChild(buttonContainer);
+    overlay.appendChild(gameOverContainer);
+    document.body.appendChild(overlay);
+}
+
+// Show congratulations screen with leaderboard
+function showCongratulationsScreen() {
+    // Remove existing popup if any
+    const existingOverlay = document.getElementById('gameOverlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'gameOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '1000';
+    overlay.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+
+    // Create congratulations container
+    const congratsContainer = document.createElement('div');
+    congratsContainer.style.backgroundColor = 'rgba(15, 15, 25, 0.95)';
+    congratsContainer.style.padding = 'clamp(24px, 5vw, 40px)';
+    congratsContainer.style.borderRadius = 'clamp(12px, 2vw, 16px)';
+    congratsContainer.style.color = 'white';
+    congratsContainer.style.textAlign = 'center';
+    congratsContainer.style.width = 'min(95%, 800px)';
+    congratsContainer.style.maxWidth = '800px';
+    congratsContainer.style.maxHeight = '90vh';
+    congratsContainer.style.overflowY = 'auto';
+    congratsContainer.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    congratsContainer.style.border = '1px solid rgba(78, 246, 211, 0.2)';
+    congratsContainer.style.boxSizing = 'border-box';
+    congratsContainer.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(78, 246, 211, 0.1)';
+    congratsContainer.style.backdropFilter = 'blur(20px)';
+    congratsContainer.style.margin = 'auto';
+
+    // Congratulations title
+    const congratsTitle = document.createElement('h1');
+    congratsTitle.textContent = '🎉 Congratulations! 🎉';
+    congratsTitle.style.color = '#4EF6D3';
+    congratsTitle.style.marginBottom = 'clamp(8px, 2vw, 12px)';
+    congratsTitle.style.fontWeight = '700';
+    congratsTitle.style.fontSize = 'clamp(24px, 6vw, 36px)';
+    congratsTitle.style.letterSpacing = '-0.02em';
+    congratsTitle.style.lineHeight = '1.2';
+    congratsTitle.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+
+    // Subtitle
+    const subtitle = document.createElement('p');
+    subtitle.textContent = `Level Completed! Final Score: ${player.score}`;
+    subtitle.style.color = 'rgba(255, 255, 255, 0.8)';
+    subtitle.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    subtitle.style.fontSize = 'clamp(16px, 4vw, 20px)';
+    subtitle.style.fontWeight = '500';
+
+    // Leaderboard title
+    const leaderboardTitle = document.createElement('h2');
+    leaderboardTitle.textContent = '🏆 Leaderboard 🏆';
+    leaderboardTitle.style.color = '#ffffff';
+    leaderboardTitle.style.marginBottom = 'clamp(12px, 3vw, 16px)';
+    leaderboardTitle.style.fontSize = 'clamp(18px, 4vw, 24px)';
+    leaderboardTitle.style.fontWeight = '600';
+    leaderboardTitle.style.marginTop = '0';
+
+    // Leaderboard container
+    const leaderboardDiv = document.createElement('div');
+    leaderboardDiv.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    leaderboardDiv.style.maxHeight = 'clamp(250px, 40vh, 300px)';
+    leaderboardDiv.style.overflowY = 'auto';
+    leaderboardDiv.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    leaderboardDiv.style.borderRadius = 'clamp(8px, 2vw, 12px)';
+    leaderboardDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+    leaderboardDiv.style.overflow = 'hidden';
+
+    // Populate leaderboard
+    if (leaderboard.length === 0) {
+        leaderboardDiv.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: rgba(255, 255, 255, 0.6);">
+                No scores yet. Be the first to play!
+            </div>
+        `;
+    } else {
+        // Create table header
+        const tableHeader = document.createElement('div');
+        tableHeader.style.display = 'grid';
+        tableHeader.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+        tableHeader.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+        tableHeader.style.backgroundColor = 'rgba(78, 246, 211, 0.1)';
+        tableHeader.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+        tableHeader.style.fontWeight = '600';
+        tableHeader.style.fontSize = 'clamp(12px, 3vw, 14px)';
+        tableHeader.style.color = '#4EF6D3';
+        
+        tableHeader.innerHTML = `
+            <div>#</div>
+            <div>Player</div>
+            <div>Best Score</div>
+            <div>Games</div>
+        `;
+        leaderboardDiv.appendChild(tableHeader);
+        
+        // Sort leaderboard by best score
+        const sortedLeaderboard = [...leaderboard].sort((a, b) => b.bestScore - a.bestScore);
+        
+        sortedLeaderboard.forEach((playerData, index) => {
+            const playerRow = document.createElement('div');
+            playerRow.style.display = 'grid';
+            playerRow.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+            playerRow.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+            playerRow.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+            playerRow.style.fontSize = 'clamp(12px, 3vw, 14px)';
+            playerRow.style.color = 'rgba(255, 255, 255, 0.9)';
+            playerRow.style.transition = 'background-color 0.2s ease';
+            
+            // Highlight current player
+            if (playerData.name === currentPlayer.name) {
+                playerRow.style.backgroundColor = 'rgba(78, 246, 211, 0.1)';
+            }
+            
+            playerRow.innerHTML = `
+                <div style="color: rgba(255, 255, 255, 0.6);">${index + 1}</div>
+                <div style="font-weight: 500;">${playerData.name}</div>
+                <div style="color: #4EF6D3; font-weight: 600;">${playerData.bestScore}</div>
+                <div style="color: rgba(255, 255, 255, 0.6);">${playerData.gamesPlayed}</div>
+            `;
+            leaderboardDiv.appendChild(playerRow);
+        });
+    }
+
+    // Button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = 'clamp(12px, 3vw, 16px)';
+    buttonContainer.style.flexDirection = 'column';
+
+    // Play Again button
+    const playAgainButton = document.createElement('button');
+    playAgainButton.textContent = 'Play Again';
+    playAgainButton.style.padding = 'clamp(12px, 3vw, 16px) clamp(20px, 4vw, 24px)';
+    playAgainButton.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    playAgainButton.style.backgroundColor = '#4EF6D3';
+    playAgainButton.style.color = '#000';
+    playAgainButton.style.border = 'none';
+    playAgainButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    playAgainButton.style.cursor = 'pointer';
+    playAgainButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    playAgainButton.style.transition = 'all 0.2s ease';
+    playAgainButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+    playAgainButton.style.fontWeight = '600';
+    playAgainButton.style.textShadow = 'none';
+    playAgainButton.style.boxSizing = 'border-box';
+
+    // Play Again button hover effects
+    playAgainButton.onmouseover = () => {
+        playAgainButton.style.transform = 'translateY(-2px)';
+        playAgainButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.5)';
+        playAgainButton.style.backgroundColor = '#5EF7E3';
+    };
+    playAgainButton.onmouseout = () => {
+        playAgainButton.style.transform = 'translateY(0)';
+        playAgainButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+        playAgainButton.style.backgroundColor = '#4EF6D3';
+    };
+
+    // Main Menu button
+    const mainMenuButton = document.createElement('button');
+    mainMenuButton.textContent = 'Main Menu';
+    mainMenuButton.style.padding = 'clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px)';
+    mainMenuButton.style.fontSize = 'clamp(12px, 3vw, 14px)';
+    mainMenuButton.style.backgroundColor = 'transparent';
+    mainMenuButton.style.color = 'rgba(255, 255, 255, 0.7)';
+    mainMenuButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    mainMenuButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    mainMenuButton.style.cursor = 'pointer';
+    mainMenuButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    mainMenuButton.style.transition = 'all 0.2s ease';
+    mainMenuButton.style.fontWeight = '500';
+    mainMenuButton.style.boxSizing = 'border-box';
+
+    // Main Menu button hover effects
+    mainMenuButton.onmouseover = () => {
+        mainMenuButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        mainMenuButton.style.color = 'rgba(255, 255, 255, 0.9)';
+        mainMenuButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    };
+    mainMenuButton.onmouseout = () => {
+        mainMenuButton.style.backgroundColor = 'transparent';
+        mainMenuButton.style.color = 'rgba(255, 255, 255, 0.7)';
+        mainMenuButton.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    };
+
+    // Button event handlers
+    playAgainButton.onclick = () => {
+        overlay.remove();
+        resetGame();
+        gameStarted = true;
+        playBackgroundMusic();
+        showMobileControls();
+        if (!window.gameLoopRunning) {
+            window.gameLoopRunning = true;
+            gameLoop();
+        }
+    };
+
+    mainMenuButton.onclick = () => {
+        overlay.remove();
+        showMainMenu();
+    };
+
+    // Assemble the congratulations screen
+    congratsContainer.appendChild(congratsTitle);
+    congratsContainer.appendChild(subtitle);
+    congratsContainer.appendChild(leaderboardTitle);
+    congratsContainer.appendChild(leaderboardDiv);
+    buttonContainer.appendChild(playAgainButton);
+    buttonContainer.appendChild(mainMenuButton);
+    congratsContainer.appendChild(buttonContainer);
+    overlay.appendChild(congratsContainer);
+    document.body.appendChild(overlay);
+}
+
+// Show main menu with leaderboard
+function showMainMenu() {
+    // Remove existing popup if any
+    const existingOverlay = document.querySelector('.auth-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    overlay.style.zIndex = '2000';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.padding = '20px';
+
+    // Create menu container
+    const menuContainer = document.createElement('div');
+    menuContainer.style.backgroundColor = 'rgba(15, 15, 25, 0.95)';
+    menuContainer.style.padding = 'clamp(24px, 5vw, 40px)';
+    menuContainer.style.borderRadius = 'clamp(12px, 2vw, 16px)';
+    menuContainer.style.color = 'white';
+    menuContainer.style.textAlign = 'left';
+    menuContainer.style.width = 'min(95%, 800px)';
+    menuContainer.style.maxWidth = '800px';
+    menuContainer.style.maxHeight = '90vh';
+    menuContainer.style.overflowY = 'auto';
+    menuContainer.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    menuContainer.style.border = '1px solid rgba(78, 246, 211, 0.2)';
+    menuContainer.style.boxSizing = 'border-box';
+    menuContainer.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(78, 246, 211, 0.1)';
+    menuContainer.style.backdropFilter = 'blur(20px)';
+    menuContainer.style.margin = 'auto';
+
+    // Welcome message
+    const welcome = document.createElement('h1');
+    welcome.textContent = `Welcome back, ${currentPlayer.name}!`;
+    welcome.style.color = '#ffffff';
+    welcome.style.marginBottom = 'clamp(8px, 2vw, 12px)';
+    welcome.style.fontSize = 'clamp(20px, 5vw, 28px)';
+    welcome.style.fontWeight = '700';
+    welcome.style.textAlign = 'center';
+    welcome.style.letterSpacing = '-0.02em';
+    welcome.style.lineHeight = '1.2';
+    menuContainer.appendChild(welcome);
+
+    // Subtitle
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Check your stats and compete on the leaderboard';
+    subtitle.style.color = 'rgba(255, 255, 255, 0.7)';
+    subtitle.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    subtitle.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    subtitle.style.fontWeight = '400';
+    subtitle.style.textAlign = 'center';
+    menuContainer.appendChild(subtitle);
+
+    // Player stats
+    const stats = document.createElement('div');
+    stats.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    stats.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+    stats.style.borderRadius = 'clamp(8px, 2vw, 12px)';
+    stats.style.padding = 'clamp(16px, 4vw, 24px)';
+    stats.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    
+    const statsTitle = document.createElement('h3');
+    statsTitle.textContent = 'Your Stats';
+    statsTitle.style.color = '#ffffff';
+    statsTitle.style.fontSize = 'clamp(16px, 4vw, 18px)';
+    statsTitle.style.fontWeight = '600';
+    statsTitle.style.marginBottom = 'clamp(12px, 3vw, 16px)';
+    statsTitle.style.marginTop = '0';
+    stats.appendChild(statsTitle);
+    
+    const statsGrid = document.createElement('div');
+    statsGrid.style.display = 'grid';
+    statsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))';
+    statsGrid.style.gap = 'clamp(12px, 3vw, 16px)';
+    
+    const gamesPlayed = document.createElement('div');
+    gamesPlayed.innerHTML = `
+        <div style="color: rgba(255, 255, 255, 0.7); font-size: clamp(12px, 3vw, 14px); margin-bottom: 4px;">Games Played</div>
+        <div style="color: #4EF6D3; font-size: clamp(18px, 4vw, 24px); font-weight: 700;">${currentPlayer.gamesPlayed}</div>
+    `;
+    statsGrid.appendChild(gamesPlayed);
+    
+    const bestScore = document.createElement('div');
+    bestScore.innerHTML = `
+        <div style="color: rgba(255, 255, 255, 0.7); font-size: clamp(12px, 3vw, 14px); margin-bottom: 4px;">Best Score</div>
+        <div style="color: #4EF6D3; font-size: clamp(18px, 4vw, 24px); font-weight: 700;">${currentPlayer.bestScore}</div>
+    `;
+    statsGrid.appendChild(bestScore);
+    
+    const totalScore = document.createElement('div');
+    totalScore.innerHTML = `
+        <div style="color: rgba(255, 255, 255, 0.7); font-size: clamp(12px, 3vw, 14px); margin-bottom: 4px;">Total Score</div>
+        <div style="color: #4EF6D3; font-size: clamp(18px, 4vw, 24px); font-weight: 700;">${currentPlayer.totalScore}</div>
+    `;
+    statsGrid.appendChild(totalScore);
+    
+    stats.appendChild(statsGrid);
+    menuContainer.appendChild(stats);
+
+    // Leaderboard
+    const leaderboardTitle = document.createElement('h2');
+    leaderboardTitle.textContent = 'Leaderboard';
+    leaderboardTitle.style.color = '#ffffff';
+    leaderboardTitle.style.marginBottom = 'clamp(12px, 3vw, 16px)';
+    leaderboardTitle.style.fontSize = 'clamp(16px, 4vw, 20px)';
+    leaderboardTitle.style.fontWeight = '600';
+    leaderboardTitle.style.marginTop = '0';
+    menuContainer.appendChild(leaderboardTitle);
+
+    const leaderboardDiv = document.createElement('div');
+    leaderboardDiv.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+    leaderboardDiv.style.maxHeight = 'clamp(250px, 40vh, 300px)';
+    leaderboardDiv.style.overflowY = 'auto';
+    leaderboardDiv.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    leaderboardDiv.style.borderRadius = 'clamp(8px, 2vw, 12px)';
+    leaderboardDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+    leaderboardDiv.style.overflow = 'hidden';
+
+    if (leaderboard.length === 0) {
+        leaderboardDiv.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: rgba(255, 255, 255, 0.6);">
+                No scores yet. Be the first to play!
+            </div>
+        `;
+    } else {
+        // Create table header
+        const tableHeader = document.createElement('div');
+        tableHeader.style.display = 'grid';
+        tableHeader.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+        tableHeader.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+        tableHeader.style.backgroundColor = 'rgba(78, 246, 211, 0.1)';
+        tableHeader.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+        tableHeader.style.fontWeight = '600';
+        tableHeader.style.fontSize = 'clamp(12px, 3vw, 14px)';
+        tableHeader.style.color = '#4EF6D3';
+        
+        tableHeader.innerHTML = `
+            <div>#</div>
+            <div>Player</div>
+            <div>Best Score</div>
+            <div>Games</div>
+        `;
+        leaderboardDiv.appendChild(tableHeader);
+        
+        // Sort leaderboard by best score
+        const sortedLeaderboard = [...leaderboard].sort((a, b) => b.bestScore - a.bestScore);
+        
+        sortedLeaderboard.forEach((player, index) => {
+            const playerRow = document.createElement('div');
+            playerRow.style.display = 'grid';
+            playerRow.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+            playerRow.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+            playerRow.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+            playerRow.style.fontSize = 'clamp(12px, 3vw, 14px)';
+            playerRow.style.color = 'rgba(255, 255, 255, 0.9)';
+            playerRow.style.transition = 'background-color 0.2s ease';
+            
+            // Highlight current player
+            if (player.name === currentPlayer.name) {
+                playerRow.style.backgroundColor = 'rgba(78, 246, 211, 0.1)';
+            }
+            
+            playerRow.innerHTML = `
+                <div style="color: rgba(255, 255, 255, 0.6);">${index + 1}</div>
+                <div style="font-weight: 500;">${player.name}</div>
+                <div style="color: #4EF6D3; font-weight: 600;">${player.bestScore}</div>
+                <div style="color: rgba(255, 255, 255, 0.6);">${player.gamesPlayed}</div>
+            `;
+            leaderboardDiv.appendChild(playerRow);
+        });
+    }
+    menuContainer.appendChild(leaderboardDiv);
+
+    // Play button
+    const playButton = document.createElement('button');
+    playButton.textContent = 'Play Game';
+    playButton.style.padding = 'clamp(12px, 3vw, 16px) clamp(20px, 4vw, 24px)';
+    playButton.style.fontSize = 'clamp(14px, 3vw, 16px)';
+    playButton.style.backgroundColor = '#4EF6D3';
+    playButton.style.color = '#000';
+    playButton.style.border = 'none';
+    playButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    playButton.style.cursor = 'pointer';
+    playButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    playButton.style.transition = 'all 0.2s ease';
+    playButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+    playButton.style.width = '100%';
+    playButton.style.marginBottom = 'clamp(12px, 3vw, 16px)';
+    playButton.style.fontWeight = '600';
+    playButton.style.textShadow = 'none';
+    playButton.style.boxSizing = 'border-box';
+
+    // Button hover effect
+    playButton.onmouseover = () => {
+        playButton.style.transform = 'translateY(-2px)';
+        playButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.5)';
+        playButton.style.backgroundColor = '#5EF7E3';
+    };
+    playButton.onmouseout = () => {
+        playButton.style.transform = 'translateY(0)';
+        playButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+        playButton.style.backgroundColor = '#4EF6D3';
+    };
+
+    playButton.onclick = () => {
+        overlay.remove();
+        gameStarted = true;
+        playBackgroundMusic();
+        showMobileControls();
+        // Ensure the game loop continues
+        if (!window.gameLoopRunning) {
+            window.gameLoopRunning = true;
+            gameLoop();
+        }
+    };
+
+    menuContainer.appendChild(playButton);
+
+    // Logout button
+    const logoutButton = document.createElement('button');
+    logoutButton.textContent = 'Change Player';
+    logoutButton.style.padding = 'clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px)';
+    logoutButton.style.fontSize = 'clamp(12px, 3vw, 14px)';
+    logoutButton.style.backgroundColor = 'transparent';
+    logoutButton.style.color = 'rgba(255, 255, 255, 0.7)';
+    logoutButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    logoutButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    logoutButton.style.cursor = 'pointer';
+    logoutButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    logoutButton.style.width = '100%';
+    logoutButton.style.transition = 'all 0.2s ease';
+    logoutButton.style.fontWeight = '500';
+    logoutButton.style.boxSizing = 'border-box';
+    
+    // Logout button hover effect
+    logoutButton.onmouseover = () => {
+        logoutButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        logoutButton.style.color = 'rgba(255, 255, 255, 0.9)';
+        logoutButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    };
+    logoutButton.onmouseout = () => {
+        logoutButton.style.backgroundColor = 'transparent';
+        logoutButton.style.color = 'rgba(255, 255, 255, 0.7)';
+        logoutButton.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    };
+
+    logoutButton.onclick = () => {
+        localStorage.removeItem('spriteyCurrentPlayer');
+        currentPlayer = null;
+        overlay.remove();
+        showLoginScreen();
+    };
+
+    menuContainer.appendChild(logoutButton);
+    overlay.appendChild(menuContainer);
+    document.body.appendChild(overlay);
+}
 
 // Create popup screen
 function createPopupScreen() {
