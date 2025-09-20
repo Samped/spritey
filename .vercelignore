@@ -1,38 +1,30 @@
-# Ignore backend code
-/backend
-
-# Ignore local environment files
-.env
-.env.local
-
-# Ignore git and system files
-.git
+# Ignore everything except frontend/ directory
+backend/
+database/
+styles/
+README.md
 .gitignore
-
-# Ignore dependencies (they will be reinstalled on build)
-node_modules
-
-# Ignore logs
+.env
+*.md
 *.log
 
-# Ignore root server files (needed for Render)
+# Ignore server files (needed for Render)
 package.json
 package-lock.json
 server.js
 server-local.js
 build-config.js
+node_modules/
 
-# Ignore any package.json files anywhere
-**/package.json
-**/package-lock.json
-
-# Ignore root frontend files (use public/ instead)
+# Ignore root files
 index.html
 test.html
 main.js
 config.js
 assets/
 
-# Ignore other files
-README.md
-*.md
+# Ignore public/ directory (use frontend/ instead)
+public/
+
+# Only include frontend/ directory
+!frontend/
