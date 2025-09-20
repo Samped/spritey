@@ -331,6 +331,7 @@ app.listen(PORT, () => {
     console.log(`🚀 Spritey Game API Server running on port ${PORT}`);
     console.log(`🌐 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:8080'}`);
     console.log(`📅 Started at: ${new Date().toISOString()}`);
+    console.log(`🔗 Allowed origins: https://spritey.vercel.app, http://localhost:8080`);
 });
 
 // Graceful shutdown
