@@ -1,0 +1,17 @@
+# Exclude Node.js backend files from Vercel deployment
+server.js
+server-simple.js
+render-deploy.js
+package.json
+package-lock.json
+node_modules/
+.env
+database.js
+api-integration.js
+README.md
+.gitignore
+.git/
+backend/
+
+# Only include public folder for static deployment
+!public/
