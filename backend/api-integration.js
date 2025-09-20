@@ -1,7 +1,10 @@
 // API Integration for Spritey Adventure Game
 // This file shows how to integrate the database API with your frontend
 
-const API_BASE_URL = 'http://localhost:3000/api';
+// Load environment variables
+require('dotenv').config();
+
+const API_BASE_URL = 'https://spriteyy.onrender.com/api';
 
 // API Helper Functions
 class GameAPI {

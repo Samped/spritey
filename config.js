@@ -4,7 +4,7 @@
 
 const CONFIG = {
     // Load API URL from environment variable (injected at build time)
-    API_BASE_URL: 'http://localhost:3000',
+    API_BASE_URL: 'https://spriteyy.onrender.com',
     
     // Environment detection (optional)
     isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
