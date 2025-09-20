@@ -16,7 +16,16 @@ const playerImage = new Image();
 playerImage.src = 'assets/player.png';
 
 const coinImage = new Image();
-coinImage.src = 'assets/gain/inco.png';
+coinImage.src = 'assets/gain/spriteycoin.png';
+
+// Add debugging for coin image loading
+coinImage.onload = function() {
+    console.log('Spriteycoin image loaded successfully');
+};
+
+coinImage.onerror = function() {
+    console.error('Error loading spriteycoin image');
+};
 
 const gunEnemyImage = new Image();
 gunEnemyImage.src = 'assets/enemies/gun.png';
@@ -413,7 +422,8 @@ const platforms = [
 
 // Coin properties
 const coins = [];
-const coinSize = 55;  // Reduced from 60 to 40
+const coinSize = 80;  // maximum visibility
+console.log('Coin size set to:', coinSize);
 const coinColor = '#FFD700';  // Gold color
 let coinFlip = 0;  // Track flip angle
 
@@ -625,7 +635,7 @@ function createCoins() {
     coins.push({ x: 34800, y: canvas.height - 950 - coinSize, width: coinSize, height: coinSize, value: 1 });
     coins.push({ x: 34800, y: canvas.height - 950 - coinSize, width: coinSize, height: coinSize, value: 1 });
     coins.push({ x: 35000, y: canvas.height - 950 - coinSize, width: coinSize, height: coinSize, value: 1 });
-    coins.push({ x: 34800, y: canvas.height - 650 - coinSize, width: 60, height: 60, value: 1, isSpecial: true });
+    coins.push({ x: 34800, y: canvas.height - 650 - coinSize, width: coinSize, height: coinSize, value: 1, isSpecial: true });
 }
 
 // Player properties
@@ -862,14 +872,22 @@ function drawCoins() {
         if (!coin.collected) {
             if (coin.isSpecial && incomascot.complete) {
                 ctx.drawImage(incomascot, coin.x, coin.y, coin.width * 3, coin.height * 3);
-            } else {
-                // Regular coin drawing code
+            } else if (coinImage.complete) {
+                // Regular coin drawing code - only draw if image is loaded
                 ctx.save();
                 ctx.translate(coin.x + coin.width/2, coin.y + coin.height/2);
                 ctx.rotate(coinFlip);
                 const scale = Math.abs(Math.cos(coinFlip));
                 ctx.scale(1, scale);
                 ctx.drawImage(coinImage, -coin.width/2, -coin.height/2, coin.width, coin.height);
+                ctx.restore();
+            } else {
+                // Fallback: draw a simple circle if image isn't loaded
+                ctx.save();
+                ctx.fillStyle = coinColor;
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.restore();
             }
         }
