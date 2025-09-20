@@ -1,4 +1,4 @@
-# Exclude ALL Node.js backend files from Vercel deployment
+# Exclude everything except public/ directory
 backend/
 database/
 styles/
@@ -16,5 +16,12 @@ server-local.js
 build-config.js
 node_modules/
 
-# Force Vercel to treat this as a static site
-vercel.json
+# Exclude root files
+index.html
+test.html
+main.js
+config.js
+assets/
+
+# Only include public/ directory
+!public/

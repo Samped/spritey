@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spritey Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background-color: #4CAF50; }
+        .error { background-color: #f44336; }
+        .info { background-color: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎮 Spritey Game Test</h1>
+        
+        <div class="status info">
+            <h3>Basic HTML Test</h3>
+            <p>✅ HTML is loading correctly</p>
+        </div>
+        
+        <div class="status info">
+            <h3>JavaScript Test</h3>
+            <p id="js-status">⏳ Testing JavaScript...</p>
+        </div>
+        
+        <div class="status info">
+            <h3>API Test</h3>
+            <p id="api-status">⏳ Testing API connection...</p>
+        </div>
+        
+        <div class="status info">
+            <h3>Canvas Test</h3>
+            <canvas id="testCanvas" width="400" height="200" style="border: 1px solid white; margin: 10px;"></canvas>
+            <p id="canvas-status">⏳ Testing Canvas...</p>
+        </div>
+        
+        <div class="status info">
+            <h3>Image Loading Test</h3>
+            <p id="image-status">⏳ Testing image loading...</p>
+        </div>
+    </div>
+
+    <script>
+        // Test JavaScript
+        document.getElementById('js-status').innerHTML = '✅ JavaScript is working';
+        
+        // Test Canvas
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#4EF6D3';
+        ctx.fillRect(50, 50, 100, 50);
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Arial';
+        ctx.fillText('Canvas Works!', 60, 80);
+        document.getElementById('canvas-status').innerHTML = '✅ Canvas is working';
+        
+        // Test API
+        fetch('https://spriteyy.onrender.com/api/health')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('api-status').innerHTML = '✅ API connection successful: ' + data.status;
+            })
+            .catch(error => {
+                document.getElementById('api-status').innerHTML = '❌ API connection failed: ' + error.message;
+            });
+        
+        // Test Image Loading
+        const testImage = new Image();
+        testImage.onload = function() {
+            document.getElementById('image-status').innerHTML = '✅ Images can load';
+        };
+        testImage.onerror = function() {
+            document.getElementById('image-status').innerHTML = '❌ Image loading failed';
+        };
+        testImage.src = 'assets/characters/spritey.webp';
+        
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>

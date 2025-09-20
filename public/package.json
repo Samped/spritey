@@ -1,0 +1,13 @@
+{
+  "name": "spritey-frontend",
+  "version": "1.0.0",
+  "description": "Spritey Game Frontend",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "start": "echo 'Static site - no start needed'"
+  },
+  "keywords": ["game", "static", "frontend"],
+  "author": "Samuel",
+  "license": "MIT"
+}
