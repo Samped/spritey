@@ -22,6 +22,10 @@ server.js
 server-local.js
 build-config.js
 
+# Ignore any package.json files anywhere
+**/package.json
+**/package-lock.json
+
 # Ignore root frontend files (use public/ instead)
 index.html
 test.html
