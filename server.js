@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
     origin: [
         process.env.CORS_ORIGIN || 'http://localhost:8080',
-        'https://spritey-6rdcps903-sampeds-projects.vercel.app',
-        'https://spritey-6rdcps903-sampeds-projects.vercel.app/'
+        'https://spritey.vercel.app',
+        'https://spritey.vercel.app/'
     ],
     credentials: true
 }));
