@@ -11,6 +11,9 @@ if (/Mobi|Android/i.test(navigator.userAgent)) {
     canvas.height = 1080;
 }
 
+// API Configuration - loaded from config.js
+const API_BASE_URL = window.CONFIG?.API_BASE_URL || 'http://localhost:3000';
+
 // Load images
 const playerImage = new Image();
 playerImage.src = 'assets/player.png';
@@ -1034,67 +1037,99 @@ function drawPlatforms() {
 function drawDashboard() {
     ctx.save();
     
-    // Draw dashboard background with transparency
-    ctx.fillStyle = 'rgba(44, 62, 80, 0.2)';
-    ctx.fillRect(20, 20, 360, 90);  // Increased height for player name
+    // Draw sleek dashboard background with gradient effect and rounded corners
+    const gradient = ctx.createLinearGradient(20, 20, 380, 20);
+    gradient.addColorStop(0, 'rgba(15, 15, 25, 0.9)');
+    gradient.addColorStop(1, 'rgba(25, 25, 35, 0.8)');
+    ctx.fillStyle = gradient;
     
-    // Draw SPRITEY with fun font
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 28px "Comic Sans MS"';
-    ctx.textAlign = 'center';
-    ctx.fillText('SPRITEY', 200, 40);  // Reverted x position
+    // Create rounded rectangle path
+    const x = 20, y = 20, width = 360, height = 100, radius = 15;
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
     
-    // Draw player name if available
+    // Add subtle border with rounded corners
+    ctx.strokeStyle = 'rgba(78, 246, 211, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Draw player name as main title with bold styling and glow
     if (currentPlayer) {
         ctx.fillStyle = '#4EF6D3';
-        ctx.font = 'bold 16px "Comic Sans MS"';
-        ctx.fillText(currentPlayer.name, 200, 60);
+        ctx.font = 'bold 28px "Inter", "Segoe UI", system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        
+        // Add glow effect to player name
+        ctx.shadowColor = 'rgba(78, 246, 211, 0.6)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(currentPlayer.name, 200, 50);
+        ctx.shadowBlur = 0;
     }
     
-    // Draw coin and score
-    ctx.beginPath();
-    ctx.arc(200, 85, 15, 0, Math.PI * 2);  // Moved down for player name
-    ctx.fillStyle = '#FFD700';
-    ctx.fill();
+    // Draw larger spriteycoin
+    if (coinImage.complete) {
+        ctx.drawImage(coinImage, 160, 70, 40, 40);
+    } else {
+        // Fallback to simple circle if image not loaded
+        ctx.beginPath();
+        ctx.arc(180, 90, 20, 0, Math.PI * 2);
+        ctx.fillStyle = '#4EF6D3';
+        ctx.fill();
+    }
     
-    // Draw shine
-    ctx.beginPath();
-    ctx.arc(195, 80, 5, 0, Math.PI * 2);  // Moved down for player name
-    ctx.fillStyle = '#FFF8DC';
-    ctx.fill();
-    
-    // Draw score
+    // Draw score with modern styling
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 20px "Comic Sans MS"';
-    ctx.fillText(`${player.score}`, 230, 90);  // Moved down for player name
+    ctx.font = 'bold 24px "Inter", "Segoe UI", system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${player.score}`, 210, 95);
     
     ctx.restore();
 }
 
-// Draw stars at top of game
+// Draw hearts at top of game
 function drawStars() {
     ctx.save();
     
-    function drawStar(x, y, size, color) {
+    function drawHeart(x, y, size, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 20, size / 20); // Scale to make heart size consistent
+        
         ctx.beginPath();
-        for (let i = 0; i < 5; i++) {
-            ctx.lineTo(x + size * Math.cos((18 + i * 72) * Math.PI / 180),
-                      y + size * Math.sin((18 + i * 72) * Math.PI / 180));
-            ctx.lineTo(x + size/2 * Math.cos((54 + i * 72) * Math.PI / 180),
-                      y + size/2 * Math.sin((54 + i * 72) * Math.PI / 180));
-        }
+        ctx.moveTo(0, 5);
+        
+        // Left curve of heart
+        ctx.bezierCurveTo(-8, -5, -15, -5, -15, 5);
+        ctx.bezierCurveTo(-15, 10, -10, 15, 0, 20);
+        
+        // Right curve of heart
+        ctx.bezierCurveTo(10, 15, 15, 10, 15, 5);
+        ctx.bezierCurveTo(15, -5, 8, -5, 0, 5);
+        
         ctx.closePath();
         ctx.fillStyle = color;
         ctx.fill();
+        
+        ctx.restore();
     }
     
-    // Draw three stars at top of game with reduced size
-    // First star - red if no deaths, gray if 1+ deaths
-    drawStar(canvas.width/2 - 40, 25, 15, player.deaths >= 1 ? '#808080' : '#ff0000');
-    // Second star - red if 0-1 deaths, gray if 2+ deaths
-    drawStar(canvas.width/2, 25, 15, player.deaths >= 2 ? '#808080' : '#ff0000');
-    // Third star - red if 0-2 deaths, gray if 3 deaths
-    drawStar(canvas.width/2 + 40, 25, 15, player.deaths >= 3 ? '#808080' : '#ff0000');
+    // Draw three hearts at top of game with reduced size
+    // First heart - cyan if no deaths, gray if 1+ deaths
+    drawHeart(canvas.width/2 - 40, 25, 15, player.deaths >= 1 ? '#808080' : '#4EF6D3');
+    // Second heart - cyan if 0-1 deaths, gray if 2+ deaths
+    drawHeart(canvas.width/2, 25, 15, player.deaths >= 2 ? '#808080' : '#4EF6D3');
+    // Third heart - cyan if 0-2 deaths, gray if 3 deaths
+    drawHeart(canvas.width/2 + 40, 25, 15, player.deaths >= 3 ? '#808080' : '#4EF6D3');
     
     ctx.restore();
 }
@@ -1509,33 +1544,102 @@ setTimeout(() => {
 }, 500);
 
 // Save player score to leaderboard
-function savePlayerScore() {
+async function savePlayerScore() {
     if (!currentPlayer) return;
     
-    // Update player stats
-    currentPlayer.gamesPlayed++;
-    currentPlayer.totalScore += player.score;
-    if (player.score > currentPlayer.bestScore) {
-        currentPlayer.bestScore = player.score;
+    try {
+        // Save score to database
+        const response = await fetch(`${API_BASE_URL}/api/score`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                playerName: currentPlayer.name,
+                score: player.score
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Score saved to database:', result);
+
+        // Update local player stats
+        currentPlayer.gamesPlayed++;
+        currentPlayer.totalScore += player.score;
+        if (player.score > currentPlayer.bestScore) {
+            currentPlayer.bestScore = player.score;
+        }
+
+        // Save to localStorage as backup
+        localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+        
+        // Refresh leaderboard from database
+        await loadLeaderboardFromAPI();
+        
+    } catch (error) {
+        console.error('Failed to save score to database:', error);
+        
+        // Fallback to localStorage
+        currentPlayer.gamesPlayed++;
+        currentPlayer.totalScore += player.score;
+        if (player.score > currentPlayer.bestScore) {
+            currentPlayer.bestScore = player.score;
+        }
+        
+        localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+        
+        // Update local leaderboard
+        const existingPlayerIndex = leaderboard.findIndex(p => p.name === currentPlayer.name);
+        if (existingPlayerIndex >= 0) {
+            leaderboard[existingPlayerIndex] = { ...currentPlayer };
+        } else {
+            leaderboard.push({ ...currentPlayer });
+        }
+        
+        localStorage.setItem('spriteyLeaderboard', JSON.stringify(leaderboard));
+        
+        console.log('Score saved to localStorage (fallback):', currentPlayer.name, player.score);
     }
-    
-    // Save updated player data
-    localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
-    
-    // Update or add to leaderboard
-    const existingPlayerIndex = leaderboard.findIndex(p => p.id === currentPlayer.id);
-    if (existingPlayerIndex >= 0) {
-        // Update existing player
-        leaderboard[existingPlayerIndex] = { ...currentPlayer };
-    } else {
-        // Add new player to leaderboard
-        leaderboard.push({ ...currentPlayer });
+}
+
+// Load leaderboard from database API
+async function loadLeaderboardFromAPI() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leaderboard`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const leaderboardData = await response.json();
+        
+        // Convert API format to expected format
+        leaderboard = leaderboardData.map(player => ({
+            name: player.name,
+            bestScore: player.bestScore,
+            gamesPlayed: player.gamesPlayed,
+            totalScore: player.totalScore || 0
+        }));
+        
+        // Save to localStorage as backup
+        localStorage.setItem('spriteyLeaderboard', JSON.stringify(leaderboard));
+        
+        console.log('Leaderboard loaded from database:', leaderboard.length, 'players');
+        
+    } catch (error) {
+        console.error('Failed to load leaderboard from database:', error);
+        
+        // Fallback to localStorage
+        const savedLeaderboard = localStorage.getItem('spriteyLeaderboard');
+        if (savedLeaderboard) {
+            leaderboard = JSON.parse(savedLeaderboard);
+            console.log('Leaderboard loaded from localStorage (fallback)');
+        }
     }
-    
-    // Save leaderboard
-    localStorage.setItem('spriteyLeaderboard', JSON.stringify(leaderboard));
-    
-    console.log('Score saved:', currentPlayer.name, player.score);
 }
 
 // Add drawWinScreen function
@@ -1727,31 +1831,84 @@ function showLoginScreen() {
     };
 
     // Login functionality
-    loginButton.onclick = () => {
+    loginButton.onclick = async () => {
         const playerName = nameInput.value.trim();
         if (playerName.length < 2) {
             alert('Please enter a name with at least 2 characters!');
             return;
         }
         
-        // Create player object
-        currentPlayer = {
-            name: playerName,
-            id: Date.now().toString(),
-            joinDate: new Date().toISOString(),
-            gamesPlayed: 0,
-            totalScore: 0,
-            bestScore: 0
-        };
-        
-        // Save player to localStorage
-        localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
-        
-        // Remove login screen
-        overlay.remove();
-        
-        // Show main menu
-        showMainMenu();
+        try {
+            // Create player in database
+            const response = await fetch(`${API_BASE_URL}/api/player`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: playerName })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Player created in database:', result);
+
+            // Get full player data from database
+            const playerResponse = await fetch(`${API_BASE_URL}/api/player/${encodeURIComponent(playerName)}`);
+            
+            if (!playerResponse.ok) {
+                throw new Error(`HTTP error! status: ${playerResponse.status}`);
+            }
+
+            const playerData = await playerResponse.json();
+            
+            // Create player object
+            currentPlayer = {
+                name: playerData.name,
+                id: playerData.id,
+                joinDate: new Date().toISOString(),
+                gamesPlayed: playerData.gamesPlayed || 0,
+                totalScore: playerData.totalScore || 0,
+                bestScore: playerData.bestScore || 0
+            };
+            
+            // Save player to localStorage as backup
+            localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+            
+            // Load leaderboard from database
+            await loadLeaderboardFromAPI();
+            
+            // Remove login screen
+            overlay.remove();
+            
+            // Show main menu
+            showMainMenu();
+            
+        } catch (error) {
+            console.error('Failed to create player in database:', error);
+            
+            // Fallback to localStorage
+            currentPlayer = {
+                name: playerName,
+                id: Date.now().toString(),
+                joinDate: new Date().toISOString(),
+                gamesPlayed: 0,
+                totalScore: 0,
+                bestScore: 0
+            };
+            
+            localStorage.setItem('spriteyCurrentPlayer', JSON.stringify(currentPlayer));
+            
+            // Remove login screen
+            overlay.remove();
+            
+            // Show main menu
+            showMainMenu();
+            
+            alert('Connected to database failed. Using offline mode.');
+        }
     };
 
     // Allow Enter key to login
@@ -1761,7 +1918,193 @@ function showLoginScreen() {
         }
     });
 
+    // Create leaderboard button
+    const leaderboardButton = document.createElement('button');
+    leaderboardButton.textContent = 'View Leaderboard';
+    leaderboardButton.style.padding = 'clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px)';
+    leaderboardButton.style.fontSize = 'clamp(12px, 3vw, 14px)';
+    leaderboardButton.style.backgroundColor = 'transparent';
+    leaderboardButton.style.color = 'rgba(255, 255, 255, 0.7)';
+    leaderboardButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    leaderboardButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+    leaderboardButton.style.cursor = 'pointer';
+    leaderboardButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+    leaderboardButton.style.transition = 'all 0.2s ease';
+    leaderboardButton.style.width = '100%';
+    leaderboardButton.style.marginTop = 'clamp(8px, 2vw, 12px)';
+    leaderboardButton.style.fontWeight = '500';
+    leaderboardButton.style.boxSizing = 'border-box';
+
+    // Leaderboard button hover effects
+    leaderboardButton.onmouseover = () => {
+        leaderboardButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        leaderboardButton.style.color = 'rgba(255, 255, 255, 0.9)';
+        leaderboardButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    };
+    leaderboardButton.onmouseout = () => {
+        leaderboardButton.style.backgroundColor = 'transparent';
+        leaderboardButton.style.color = 'rgba(255, 255, 255, 0.7)';
+        leaderboardButton.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    };
+
+    // Leaderboard button functionality
+    leaderboardButton.onclick = async () => {
+        try {
+            // Load leaderboard from database
+            await loadLeaderboardFromAPI();
+            
+            // Create leaderboard overlay
+            const leaderboardOverlay = document.createElement('div');
+            leaderboardOverlay.style.position = 'fixed';
+            leaderboardOverlay.style.top = '0';
+            leaderboardOverlay.style.left = '0';
+            leaderboardOverlay.style.width = '100%';
+            leaderboardOverlay.style.height = '100%';
+            leaderboardOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+            leaderboardOverlay.style.zIndex = '3000';
+            leaderboardOverlay.style.display = 'flex';
+            leaderboardOverlay.style.justifyContent = 'center';
+            leaderboardOverlay.style.alignItems = 'center';
+            leaderboardOverlay.style.padding = '20px';
+
+            // Create leaderboard container
+            const leaderboardContainer = document.createElement('div');
+            leaderboardContainer.style.backgroundColor = 'rgba(15, 15, 25, 0.95)';
+            leaderboardContainer.style.padding = 'clamp(24px, 5vw, 40px)';
+            leaderboardContainer.style.borderRadius = 'clamp(12px, 2vw, 16px)';
+            leaderboardContainer.style.color = 'white';
+            leaderboardContainer.style.textAlign = 'center';
+            leaderboardContainer.style.width = 'min(95%, 600px)';
+            leaderboardContainer.style.maxWidth = '600px';
+            leaderboardContainer.style.maxHeight = '80vh';
+            leaderboardContainer.style.overflowY = 'auto';
+            leaderboardContainer.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+            leaderboardContainer.style.border = '1px solid rgba(78, 246, 211, 0.2)';
+            leaderboardContainer.style.boxSizing = 'border-box';
+            leaderboardContainer.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(78, 246, 211, 0.1)';
+            leaderboardContainer.style.backdropFilter = 'blur(20px)';
+            leaderboardContainer.style.margin = 'auto';
+
+            // Leaderboard title
+            const leaderboardTitle = document.createElement('h2');
+            leaderboardTitle.textContent = 'Global Leaderboard';
+            leaderboardTitle.style.color = '#4EF6D3';
+            leaderboardTitle.style.marginBottom = 'clamp(16px, 4vw, 24px)';
+            leaderboardTitle.style.fontWeight = '700';
+            leaderboardTitle.style.fontSize = 'clamp(20px, 5vw, 28px)';
+            leaderboardTitle.style.letterSpacing = '-0.02em';
+            leaderboardTitle.style.lineHeight = '1.2';
+
+            // Leaderboard content
+            const leaderboardDiv = document.createElement('div');
+            leaderboardDiv.style.marginBottom = 'clamp(24px, 5vw, 32px)';
+            leaderboardDiv.style.maxHeight = 'clamp(300px, 50vh, 400px)';
+            leaderboardDiv.style.overflowY = 'auto';
+            leaderboardDiv.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            leaderboardDiv.style.borderRadius = 'clamp(8px, 2vw, 12px)';
+            leaderboardDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+            leaderboardDiv.style.overflow = 'hidden';
+
+            // Populate leaderboard
+            if (leaderboard.length === 0) {
+                leaderboardDiv.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: rgba(255, 255, 255, 0.6);">
+                        No scores yet. Be the first to play!
+                    </div>
+                `;
+            } else {
+                // Create table header
+                const tableHeader = document.createElement('div');
+                tableHeader.style.display = 'grid';
+                tableHeader.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+                tableHeader.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+                tableHeader.style.backgroundColor = 'rgba(78, 246, 211, 0.1)';
+                tableHeader.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+                tableHeader.style.fontWeight = '600';
+                tableHeader.style.fontSize = 'clamp(12px, 3vw, 14px)';
+                tableHeader.style.color = '#4EF6D3';
+                
+                tableHeader.innerHTML = `
+                    <div>#</div>
+                    <div>Player</div>
+                    <div>Best Score</div>
+                    <div>Games</div>
+                `;
+                leaderboardDiv.appendChild(tableHeader);
+                
+                // Sort leaderboard by best score
+                const sortedLeaderboard = [...leaderboard].sort((a, b) => b.bestScore - a.bestScore);
+                
+                sortedLeaderboard.forEach((player, index) => {
+                    const playerRow = document.createElement('div');
+                    playerRow.style.display = 'grid';
+                    playerRow.style.gridTemplateColumns = 'clamp(40px, 8vw, 60px) 1fr clamp(80px, 15vw, 120px) clamp(60px, 12vw, 120px)';
+                    playerRow.style.padding = 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)';
+                    playerRow.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+                    playerRow.style.fontSize = 'clamp(12px, 3vw, 14px)';
+                    playerRow.style.color = 'rgba(255, 255, 255, 0.9)';
+                    playerRow.style.transition = 'background-color 0.2s ease';
+                    
+                    playerRow.innerHTML = `
+                        <div style="color: rgba(255, 255, 255, 0.6);">${index + 1}</div>
+                        <div style="font-weight: 500;">${player.name}</div>
+                        <div style="color: #4EF6D3; font-weight: 600;">${player.bestScore}</div>
+                        <div style="color: rgba(255, 255, 255, 0.6);">${player.gamesPlayed}</div>
+                    `;
+                    leaderboardDiv.appendChild(playerRow);
+                });
+            }
+
+            // Close button
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.style.padding = 'clamp(12px, 3vw, 16px) clamp(20px, 4vw, 24px)';
+            closeButton.style.fontSize = 'clamp(14px, 3vw, 16px)';
+            closeButton.style.backgroundColor = '#4EF6D3';
+            closeButton.style.color = '#000';
+            closeButton.style.border = 'none';
+            closeButton.style.borderRadius = 'clamp(6px, 1vw, 8px)';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.fontFamily = '"Inter", "Segoe UI", system-ui, sans-serif';
+            closeButton.style.transition = 'all 0.2s ease';
+            closeButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+            closeButton.style.width = '100%';
+            closeButton.style.fontWeight = '600';
+            closeButton.style.textShadow = 'none';
+            closeButton.style.boxSizing = 'border-box';
+
+            // Close button hover effects
+            closeButton.onmouseover = () => {
+                closeButton.style.transform = 'translateY(-2px)';
+                closeButton.style.boxShadow = '0 8px 20px rgba(78, 246, 211, 0.5)';
+                closeButton.style.backgroundColor = '#5EF7E3';
+            };
+            closeButton.onmouseout = () => {
+                closeButton.style.transform = 'translateY(0)';
+                closeButton.style.boxShadow = '0 4px 12px rgba(78, 246, 211, 0.3)';
+                closeButton.style.backgroundColor = '#4EF6D3';
+            };
+
+            // Close button functionality
+            closeButton.onclick = () => {
+                leaderboardOverlay.remove();
+            };
+
+            // Assemble leaderboard screen
+            leaderboardContainer.appendChild(leaderboardTitle);
+            leaderboardContainer.appendChild(leaderboardDiv);
+            leaderboardContainer.appendChild(closeButton);
+            leaderboardOverlay.appendChild(leaderboardContainer);
+            document.body.appendChild(leaderboardOverlay);
+
+        } catch (error) {
+            console.error('Failed to load leaderboard:', error);
+            alert('Failed to load leaderboard. Please try again.');
+        }
+    };
+
     loginContainer.appendChild(loginButton);
+    loginContainer.appendChild(leaderboardButton);
     overlay.appendChild(loginContainer);
     document.body.appendChild(overlay);
     
@@ -1940,7 +2283,10 @@ function showGameOverScreen() {
 }
 
 // Show congratulations screen with leaderboard
-function showCongratulationsScreen() {
+async function showCongratulationsScreen() {
+    // Load leaderboard from database
+    await loadLeaderboardFromAPI();
+    
     // Remove existing popup if any
     const existingOverlay = document.getElementById('gameOverlay');
     if (existingOverlay) {
@@ -2166,7 +2512,10 @@ function showCongratulationsScreen() {
 }
 
 // Show main menu with leaderboard
-function showMainMenu() {
+async function showMainMenu() {
+    // Load leaderboard from database
+    await loadLeaderboardFromAPI();
+    
     // Remove existing popup if any
     const existingOverlay = document.querySelector('.auth-overlay');
     if (existingOverlay) {
