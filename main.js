@@ -193,17 +193,43 @@ const totalImages = 8;  // playerImage (spritey), coinImage, gunEnemyImage, spri
 
 function imageLoaded() {
     imagesLoaded++;
+    console.log(`Image loaded: ${imagesLoaded}/${totalImages}`);
     if (imagesLoaded === totalImages) {
+        console.log('All images loaded! Starting game...');
         // Start game loop only after all images are loaded
         initGame();
     }
 }
 
 playerImage.onload = imageLoaded;
+playerImage.onerror = function() {
+    console.error('Failed to load player image:', playerImage.src);
+    imageLoaded(); // Still count it to prevent infinite waiting
+};
+
 coinImage.onload = imageLoaded;
+coinImage.onerror = function() {
+    console.error('Failed to load coin image:', coinImage.src);
+    imageLoaded();
+};
+
 gunEnemyImage.onload = imageLoaded;
+gunEnemyImage.onerror = function() {
+    console.error('Failed to load gun enemy image:', gunEnemyImage.src);
+    imageLoaded();
+};
+
 spriteyenemyImage.onload = imageLoaded;
+spriteyenemyImage.onerror = function() {
+    console.error('Failed to load spritey enemy image:', spriteyenemyImage.src);
+    imageLoaded();
+};
+
 spriteywin.onload = imageLoaded;
+spriteywin.onerror = function() {
+    console.error('Failed to load spritey win image:', spriteywin.src);
+    imageLoaded();
+};
 
 // Add onload handlers for background images
 backgroundImages.forEach((img, index) => {
@@ -213,6 +239,7 @@ backgroundImages.forEach((img, index) => {
     };
     img.onerror = function() {
         console.error(`Error loading background image ${index}:`, img.src);
+        imageLoaded(); // Still count it to prevent infinite waiting
     };
 });
 
@@ -1488,9 +1515,11 @@ function draw() {
 
 // Initialize game
 function initGame() {
+    console.log('initGame() called');
     createCoins();  // Create coins
     resetPlayer();
     createMobileControls(); // Add mobile controls
+    console.log('Game initialized successfully');
     // Don't initialize auth system here - let the event listeners handle it
 }
 
@@ -1700,6 +1729,7 @@ function showLoginScreen() {
     // Remove existing popup if any
     const existingOverlay = document.querySelector('.auth-overlay');
     if (existingOverlay) {
+        console.log('Removing existing overlay');
         existingOverlay.remove();
     }
     
