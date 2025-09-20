@@ -14,3 +14,21 @@ node_modules
 
 # Ignore logs
 *.log
+
+# Ignore root server files (needed for Render)
+package.json
+package-lock.json
+server.js
+server-local.js
+build-config.js
+
+# Ignore root frontend files (use public/ instead)
+index.html
+test.html
+main.js
+config.js
+assets/
+
+# Ignore other files
+README.md
+*.md
