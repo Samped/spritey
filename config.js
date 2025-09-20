@@ -4,11 +4,10 @@
 // For production (Render): change to your Render app URL
 
 const CONFIG = {
-    // API Base URL - Change this when deploying to production
-    API_BASE_URL: 'http://localhost:3000',
+
     
     // For production deployment on Render, uncomment and update the line below:
-    // API_BASE_URL: 'https://your-app-name.onrender.com',
+     API_BASE_URL: 'https://spritey.onrender.com',
     
     // Environment detection (optional)
     isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
