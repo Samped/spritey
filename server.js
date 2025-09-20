@@ -179,6 +179,11 @@ app.get('/api/player/:name', async (req, res) => {
     }
 });
 
+// Simple test endpoint
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Test endpoint working', timestamp: new Date().toISOString() });
+});
+
 // Create or get player
 app.post('/api/player', async (req, res) => {
     try {
