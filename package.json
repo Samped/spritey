@@ -1,0 +1,17 @@
+{
+  "name": "spritey-game",
+  "version": "1.0.0",
+  "description": "A pixel art sprite platformer game",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx http-server -p 3000 -o",
+    "serve": "npx http-server -p 8080 -o"
+  },
+  "keywords": ["game", "platformer", "rabbit", "pixel-art"],
+  "author": "Samuel",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
