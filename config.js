@@ -7,7 +7,7 @@ const CONFIG = {
 
     
     // For production deployment on Render, uncomment and update the line below:
-     API_BASE_URL: 'https://spritey-6rdcps903-sampeds-projects.vercel.app',
+     API_BASE_URL: 'https://spriteyy.onrender.com',
     
     // Environment detection (optional)
     isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
