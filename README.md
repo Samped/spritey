@@ -13,7 +13,7 @@ A simple platformer game featuring Spritey the sprite. Built with HTML5 Canvas a
 
 1. Clone the repository:
 ```bash
-git clone [your-repo-url]
+git clone https://github.com/Samped/spritey.git
 ```
 
 2. Open `index.html` in your web browser

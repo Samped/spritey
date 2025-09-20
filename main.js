@@ -67,15 +67,27 @@ sounds.background.volume = 0.5; // Set volume to 50%
 
 // Function to draw animated background with smooth transitions
 function drawAnimatedBackground() {
-    if (backgroundImages.length === 0) return;
+    if (backgroundImages.length === 0) {
+        console.log('No background images loaded');
+        return;
+    }
     
     // Ensure we have valid background indices
     const currentBg = backgroundImages[currentBackgroundIndex];
     const nextBg = backgroundImages[(currentBackgroundIndex + 1) % backgroundImages.length];
     
+    // Debug logging
+    if (currentBackgroundIndex === 0 && !currentBg.complete) {
+        console.log('Current background not loaded:', currentBg.src, 'complete:', currentBg.complete);
+    }
+    
     // Draw current background
     if (currentBg && currentBg.complete) {
         ctx.drawImage(currentBg, camera.x, 0, canvas.width, canvas.height);
+    } else {
+        // Fallback: draw a solid color background
+        ctx.fillStyle = '#E0F7FF';
+        ctx.fillRect(camera.x, 0, canvas.width, canvas.height);
     }
     
     // Draw next background with transition opacity if transitioning
@@ -182,13 +194,19 @@ incoEnemyImage.onload = imageLoaded;
 incomascot.onload = imageLoaded;
 
 // Add onload handlers for background images
-backgroundImages.forEach(img => {
-    img.onload = imageLoaded;
+backgroundImages.forEach((img, index) => {
+    img.onload = function() {
+        console.log(`Background image ${index} loaded successfully:`, img.src);
+        imageLoaded();
+    };
+    img.onerror = function() {
+        console.error(`Error loading background image ${index}:`, img.src);
+    };
 });
 
 // Load character image
 const spritey = new Image();
-spritey.src = 'assets/characters/rabio.png';
+spritey.src = 'assets/characters/spritey.webp';
 
 // Add image loading verification
 spritey.onload = function() {
@@ -614,8 +632,8 @@ function createCoins() {
 const player = {
     x: 100,
     y: canvas.height - groundHeight - 50,
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     velocityX: 0,
     velocityY: 0,
     speed: 8,
@@ -932,7 +950,7 @@ function updatePlayer() {
             direction: player.facingRight ? 1 : -1,
             radius: bulletRadius,
             startX: player.x + (player.facingRight ? player.width : 0),
-            color: '#0000ff'
+            color: playerBulletColor
         });
         lastPlayerShot = Date.now();
         playSound('shoot');
@@ -941,11 +959,11 @@ function updatePlayer() {
 
 // Draw a single fine brick with gradient, outline, and mortar
 function drawFineBrick(x, y, width, height) {
-    // Brick gradient
+    // Brick gradient with new color
     const brickGradient = ctx.createLinearGradient(x, y, x, y + height);
-    brickGradient.addColorStop(0, '#b22222');  // Classic brick red top
-    brickGradient.addColorStop(0.5, '#8B0000'); // Darker red middle
-    brickGradient.addColorStop(1, '#800000');   // Deep red bottom
+    brickGradient.addColorStop(0, '#4EF6D3');  // Light teal top
+    brickGradient.addColorStop(0.5, '#3DD1B8'); // Medium teal middle
+    brickGradient.addColorStop(1, '#2BB5A0');   // Darker teal bottom
     ctx.fillStyle = brickGradient;
     ctx.fillRect(x, y, width, height);
 
@@ -1063,6 +1081,7 @@ const enemyBulletSpeed = 11  // Speed for enemy bullets
 const playerBulletSpeed = 13; // Speed for player bullets
 const bulletRadius = 5;
 const bulletColor = '#000000';
+const playerBulletColor = '#4EF6D3';
 const bulletMaxDistance = 500;
 
 // Enemy properties
@@ -1716,7 +1735,7 @@ function createMobileControls() {
                 direction: player.facingRight ? 1 : -1,
                 radius: bulletRadius,
                 startX: player.x + (player.facingRight ? player.width : 0),
-                color: '#0000ff'
+                color: playerBulletColor
             });
             lastPlayerShot = Date.now();
             playSound('shoot');
