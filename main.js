@@ -16,7 +16,7 @@ const API_BASE_URL = window.CONFIG?.API_BASE_URL || 'http://localhost:3000';
 
 // Load images
 const playerImage = new Image();
-playerImage.src = 'assets/player.png';
+playerImage.src = 'assets/characters/spritey.webp';
 
 const coinImage = new Image();
 coinImage.src = 'assets/gain/spriteycoin.png';
@@ -189,7 +189,7 @@ function playSound(soundName) {
 
 // Wait for images to load
 let imagesLoaded = 0;
-const totalImages = 9;  // Updated to include both enemy images + 4 background images
+const totalImages = 8;  // playerImage (spritey), coinImage, gunEnemyImage, spriteyenemyImage, spriteywin, 4 background images
 
 function imageLoaded() {
     imagesLoaded++;
