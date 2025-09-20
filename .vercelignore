@@ -1,4 +1,4 @@
-# Exclude ALL Node.js backend files from Vercel deployment
+# Exclude Node.js backend files from Vercel deployment
 backend/
 database/
 styles/
@@ -8,12 +8,8 @@ README.md
 *.md
 *.log
 
-# Exclude any remaining Node.js files
+# Exclude server files (needed for Render)
 package.json
 package-lock.json
 server.js
-server-simple.js
-render-deploy.js
-database.js
-api-integration.js
 node_modules/
