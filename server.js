@@ -76,7 +76,8 @@ mongoose.connect(MONGODB_URI, {
 })
 .catch((error) => {
     console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    console.log('⚠️  Server will continue without database connection');
+    // Don't exit - let server run without database
 });
 
 // Middleware to update player's updatedAt field
