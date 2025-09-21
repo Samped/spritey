@@ -12,6 +12,18 @@
       "dest": "/frontend/test.html"
     },
     {
+      "src": "/config.js",
+      "dest": "/frontend/config.js"
+    },
+    {
+      "src": "/main.js",
+      "dest": "/frontend/main.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/frontend/assets/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/index.html"
     }
