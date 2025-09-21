@@ -16,10 +16,10 @@ const API_BASE_URL = window.CONFIG?.API_BASE_URL || 'http://localhost:3000';
 
 // Load images
 const playerImage = new Image();
-playerImage.src = 'assets/characters/spritey.webp';
+playerImage.src = './assets/characters/spritey.webp';
 
 const coinImage = new Image();
-coinImage.src = 'assets/gain/spriteycoin.png';
+coinImage.src = './assets/gain/spriteycoin.png';
 
 // Add debugging for coin image loading
 coinImage.onload = function() {
@@ -31,18 +31,18 @@ coinImage.onerror = function() {
 };
 
 const gunEnemyImage = new Image();
-gunEnemyImage.src = 'assets/enemies/gun.png';
+gunEnemyImage.src = './assets/enemies/gun.png';
 
 const spriteyenemyImage = new Image();
-spriteyenemyImage.src = 'assets/enemies/spriteyenemy.png';
+spriteyenemyImage.src = './assets/enemies/spriteyenemy.png';
 
 // Load multiple background images for progression
 const backgroundImages = [];
 const backgroundPaths = [
-    'assets/backgrounds/Frame_48096685.webp',
-    'assets/backgrounds/Frame_48096687.webp', 
-    'assets/backgrounds/Frame_48096688.webp',
-    'assets/backgrounds/Frame_48096691.webp'
+    './assets/backgrounds/Frame_48096685.webp',
+    './assets/backgrounds/Frame_48096687.webp', 
+    './assets/backgrounds/Frame_48096688.webp',
+    './assets/backgrounds/Frame_48096691.webp'
 ];
 
 // Initialize background images
@@ -59,18 +59,18 @@ let backgroundTransitionSpeed = 0.002; // Speed of transition
 let backgroundChangeTrigger = 0; // Score threshold for background changes
 
 const spriteywin = new Image();
-spriteywin.src = 'assets/gain/spriteywin.png';
+spriteywin.src = './assets/gain/spriteywin.png';
 
 // Load sound effects
 const sounds = {
-    jump: new Audio('assets/sounds/jump.mp3'),
-    coin: new Audio('assets/sounds/coin.mp3'),
-    shoot: new Audio('assets/sounds/shoot.mp3'),
-    enemyHit: new Audio('assets/sounds/enemy-hit.mp3'),
-    playerHit: new Audio('assets/sounds/player-hit.mp3'),
-    gameOver: new Audio('assets/sounds/game-over.mp3'),
-    win: new Audio('assets/sounds/win.mp3'),
-    background: new Audio('assets/sounds/background-sound.mp3')
+    jump: new Audio('./assets/sounds/jump.mp3'),
+    coin: new Audio('./assets/sounds/coin.mp3'),
+    shoot: new Audio('./assets/sounds/shoot.mp3'),
+    enemyHit: new Audio('./assets/sounds/enemy-hit.mp3'),
+    playerHit: new Audio('./assets/sounds/player-hit.mp3'),
+    gameOver: new Audio('./assets/sounds/game-over.mp3'),
+    win: new Audio('./assets/sounds/win.mp3'),
+    background: new Audio('./assets/sounds/background-sound.mp3')
 };
 
 // Set background music to loop
@@ -245,7 +245,7 @@ backgroundImages.forEach((img, index) => {
 
 // Load character image
 const spritey = new Image();
-spritey.src = 'assets/characters/spritey.webp';
+spritey.src = './assets/characters/spritey.webp';
 
 // Add image loading verification
 spritey.onload = function() {
