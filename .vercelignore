@@ -4,3 +4,11 @@ server-local.js
 database/
 *.log
 .env
+package.json
+package-lock.json
+build-config.js
+node_modules/
+README.md
+*.md
+public/
+frontend/
